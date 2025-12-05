@@ -4,12 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>F1 Race Control Lap Timer - Dual Driver</title>
-    <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Load Tone.js for audio feedback -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
     
-    <!-- Custom style for digital look and feel -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Chivo+Mono:wght@400;700&display=swap');
         
@@ -20,14 +17,32 @@
             transition: text-shadow 0.3s ease-in-out, color 0.3s ease-in-out;
         }
 
-        /* Carbon Fiber-ish background pattern */
-        .carbon-bg {
-            background-color: #111;
+        /* Background Handling: F1 Image + Dark Overlay */
+        body {
+            background-color: #050505;
+            position: relative;
+            /* High quality F1 atmosphere background */
+            background-image: url('https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?q=80&w=2670&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+
+        /* Overlay to ensure text readability over the car image */
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85); /* 85% opacity black */
             background-image: 
-                linear-gradient(45deg, #1a1a1a 25%, transparent 25%, transparent 75%, #1a1a1a 75%, #1a1a1a),
-                linear-gradient(45deg, #1a1a1a 25%, transparent 25%, transparent 75%, #1a1a1a 75%, #1a1a1a);
-            background-size: 20px 20px;
-            background-position: 0 0, 10px 10px;
+                linear-gradient(45deg, rgba(20,20,20,0.5) 25%, transparent 25%, transparent 75%, rgba(20,20,20,0.5) 75%, rgba(20,20,20,0.5)),
+                linear-gradient(45deg, rgba(20,20,20,0.5) 25%, transparent 25%, transparent 75%, rgba(20,20,20,0.5) 75%, rgba(20,20,20,0.5));
+            background-size: 4px 4px;
+            z-index: -1;
+            pointer-events: none;
         }
 
         /* Checkered Flag Pattern Animation */
@@ -68,14 +83,6 @@
             background: #1f2937; /* gray-800 */
         }
 
-        /* Background Track SVG */
-        .track-bg {
-            background-image: url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M40 160C40 160 20 160 20 140C20 120 40 100 80 100C120 100 140 80 140 60C140 40 120 20 100 20C80 20 60 40 60 40' stroke='%23374151' stroke-width='4' stroke-opacity='0.3'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: center;
-            background-size: contain;
-        }
-
         /* F1 Lights Styling */
         .light {
             background-color: #1f2937; /* gray-800 off state */
@@ -94,24 +101,21 @@
         }
     </style>
 </head>
-<body class="carbon-bg text-white min-h-screen flex flex-col items-center justify-center p-4">
+<body class="text-white min-h-screen flex flex-col items-center justify-center p-4">
 
-    <!-- Stopwatch Container -->
-    <div class="w-full max-w-7xl bg-gray-800 rounded-2xl shadow-2xl overflow-hidden border-4 border-red-600 transition duration-300 hover:shadow-red-700/70 relative min-h-[600px] flex flex-col">
+    <div class="bg-overlay"></div>
+
+    <div class="w-full max-w-7xl bg-gray-900/90 backdrop-blur-md rounded-2xl shadow-2xl overflow-hidden border-4 border-red-600 transition duration-300 hover:shadow-red-700/70 relative min-h-[600px] flex flex-col">
         
-        <!-- Checkered Banner -->
         <div class="checkered-strip flex-shrink-0"></div>
 
         <div class="p-6 md:p-10 pt-8 flex-grow">
             
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-stretch h-full">
                 
-                <!-- LEFT PANEL: TIMER CONTROL -->
                 <div class="flex flex-col justify-between h-full">
-                    <!-- Header with F1 Icon -->
                     <div class="flex flex-col items-center mb-6">
                         <div class="flex items-center space-x-3 mb-2">
-                            <!-- F1 Car SVG Icon -->
                             <svg class="w-24 h-12 text-red-500 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M1,12 L3,12 L4,14 L7,14 L8,12 L14,12 L15,10 L9,10 L8,8 L16,8 L19,10 L23,10 L23,12 L21,14 L23,14 L23,16 L1,16 Z M4,15 A1,1 0 1,0 4,17 A1,1 0 1,0 4,15 Z M19,15 A1,1 0 1,0 19,17 A1,1 0 1,0 19,15 Z" transform="scale(1, 0.8) translate(0, 3)"/>
                             </svg>
@@ -121,7 +125,6 @@
                         </h1>
                     </div>
 
-                    <!-- F1 START LIGHTS GANTRY -->
                     <div class="flex justify-center items-center gap-3 mb-10 p-4 bg-black rounded-lg border-2 border-gray-700 shadow-2xl">
                         <div class="light w-10 h-10 md:w-14 md:h-14 rounded-full border-4 border-gray-600 transition-all duration-75" id="light1"></div>
                         <div class="light w-10 h-10 md:w-14 md:h-14 rounded-full border-4 border-gray-600 transition-all duration-75" id="light2"></div>
@@ -130,19 +133,16 @@
                         <div class="light w-10 h-10 md:w-14 md:h-14 rounded-full border-4 border-gray-600 transition-all duration-75" id="light5"></div>
                     </div>
 
-                    <!-- Main Display -->
                     <div class="relative mb-10">
-                        <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gray-800 px-2 text-xs text-gray-500 uppercase tracking-widest">
+                        <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gray-800 px-2 text-xs text-gray-500 uppercase tracking-widest border border-gray-700 rounded">
                             Session Time
                         </div>
-                        <div id="display" class="digital-display text-5xl md:text-6xl lg:text-7xl text-center font-bold p-6 bg-gray-900 rounded-lg border-2 border-red-700 select-none stopped-glow">
+                        <div id="display" class="digital-display text-5xl md:text-6xl lg:text-7xl text-center font-bold p-6 bg-black/50 rounded-lg border-2 border-red-700 select-none stopped-glow">
                             00:00.000
                         </div>
                     </div>
 
-                    <!-- Controls -->
                     <div class="space-y-4 mt-auto">
-                        <!-- Main Start/Stop -->
                         <button id="mainButton" 
                                 class="w-full px-4 py-5 text-xl font-bold rounded-xl transition duration-200 
                                     bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-700/50 
@@ -151,9 +151,7 @@
                             <span>START SEQUENCE</span>
                         </button>
                         
-                        <!-- Driver Lap Buttons -->
                         <div class="flex space-x-4">
-                            <!-- Driver 1 Button -->
                             <button id="lapButton1" 
                                     class="flex-1 px-4 py-5 text-lg font-bold rounded-xl transition duration-200 
                                         bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-700/50 
@@ -164,7 +162,6 @@
                                 <span class="btn-text">LAP</span>
                             </button>
 
-                            <!-- Driver 2 Button -->
                             <button id="lapButton2" 
                                     class="flex-1 px-4 py-5 text-lg font-bold rounded-xl transition duration-200 
                                         bg-orange-600 hover:bg-orange-700 text-white shadow-lg shadow-orange-700/50 
@@ -178,7 +175,6 @@
                     </div>
                 </div>
 
-                <!-- RIGHT PANEL: LEADERBOARD & DATA (Visual Split) -->
                 <div class="flex flex-col space-y-6 lg:border-l lg:border-gray-700 lg:pl-10 relative">
                     
                     <h2 class="text-xl font-semibold text-red-400 border-b border-red-700 pb-1 flex justify-between items-end">
@@ -186,46 +182,39 @@
                         <span class="text-xs text-gray-500 font-normal">REAL-TIME</span>
                     </h2>
 
-                    <!-- Dual Driver Columns -->
                     <div class="grid grid-cols-2 gap-4 flex-1 min-h-[250px]">
                         
-                        <!-- Driver 1 Column -->
-                        <div class="flex flex-col bg-gray-900/30 rounded-lg p-2 border border-gray-700">
-                            <!-- Input D1 -->
+                        <div class="flex flex-col bg-gray-900/50 rounded-lg p-2 border border-gray-700">
                             <div class="mb-2">
                                 <input type="text" id="driverName1" value="HAM" maxlength="20" 
                                     class="bg-blue-900/20 text-blue-400 font-mono font-bold text-center w-full px-2 py-1 rounded border border-blue-900/50 focus:border-blue-500 focus:outline-none uppercase text-lg"
                                     placeholder="DRIVER 1">
                             </div>
-                            <!-- List D1 -->
-                            <div id="lapTimes1" class="lap-list flex-1 overflow-y-auto bg-gray-900 p-2 rounded border border-gray-800 relative z-10">
+                            <div id="lapTimes1" class="lap-list flex-1 overflow-y-auto bg-black/40 p-2 rounded border border-gray-800 relative z-10">
                                 <p id="noLapsMessage1" class="text-gray-600 text-xs text-center py-10">Ready</p>
                             </div>
                         </div>
 
-                        <!-- Driver 2 Column -->
-                        <div class="flex flex-col bg-gray-900/30 rounded-lg p-2 border border-gray-700">
-                            <!-- Input D2 -->
+                        <div class="flex flex-col bg-gray-900/50 rounded-lg p-2 border border-gray-700">
                             <div class="mb-2">
                                 <input type="text" id="driverName2" value="RUS" maxlength="20" 
                                     class="bg-orange-900/20 text-orange-400 font-mono font-bold text-center w-full px-2 py-1 rounded border border-orange-900/50 focus:border-orange-500 focus:outline-none uppercase text-lg"
                                     placeholder="DRIVER 2">
                             </div>
-                            <!-- List D2 -->
-                            <div id="lapTimes2" class="lap-list flex-1 overflow-y-auto bg-gray-900 p-2 rounded border border-gray-800 relative z-10">
+                            <div id="lapTimes2" class="lap-list flex-1 overflow-y-auto bg-black/40 p-2 rounded border border-gray-800 relative z-10">
                                 <p id="noLapsMessage2" class="text-gray-600 text-xs text-center py-10">Ready</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Leaderboard (Persistent) -->
                     <div class="relative flex-1 min-h-[250px] flex flex-col mt-4">
                         <h2 class="text-xl font-semibold mb-3 text-yellow-400 border-b border-yellow-700 pb-1 flex justify-between items-end">
                             <span>LEADERBOARD</span>
-                            <span class="text-xs text-gray-500 font-normal">TOP 5 ALL-TIME</span>
+                            <button onclick="resetLeaderboard()" class="text-[10px] bg-red-900/50 hover:bg-red-600 text-red-200 border border-red-800/50 px-2 py-1 rounded transition uppercase tracking-wider">
+                                Reset Records
+                            </button>
                         </h2>
-                        <div id="leaderboardList" class="bg-gray-900 p-3 rounded-lg border border-gray-700 flex-1">
-                            <!-- Leaderboard items will be injected here -->
+                        <div id="leaderboardList" class="bg-black/60 p-3 rounded-lg border border-gray-700 flex-1">
                             <p class="text-gray-500 text-xs text-center py-20">No records set yet.</p>
                         </div>
                     </div>
@@ -295,7 +284,7 @@
         };
 
         // Leaderboard Variables
-        const LEADERBOARD_KEY = 'f1_leaderboard_v2'; // Version bump for dual driver support
+        const LEADERBOARD_KEY = 'f1_leaderboard_v2'; 
         let leaderboard = [];
 
         // --- Initialization ---
@@ -433,6 +422,15 @@
             });
             html += '</div>';
             leaderboardContainer.innerHTML = html;
+        }
+
+        // --- NEW RESET FUNCTION ---
+        function resetLeaderboard() {
+            if(confirm("Are you sure you want to clear the entire leaderboard? This cannot be undone.")) {
+                leaderboard = [];
+                localStorage.removeItem(LEADERBOARD_KEY);
+                renderLeaderboard();
+            }
         }
 
         // --- Control Logic ---
